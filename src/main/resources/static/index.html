@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all"/>
+    <title>用户登录</title>
+    <link rel="shortcut iocn" href="#" />
+</head>
+<body background="/img/register.jpg">
+<div class="layui-form-item" style="text-align: center;">
+    <h1 style="text-align: center;">用户登录</h1>
+    <div class="layui-inline">
+        <label class="layui-form-label">用户名</label>
+        <div class="layui-input-inline">
+            <input type = "text" placeholder="用户名" name="username" id="username" class="layui-input">
+        </div>
+    </div>
+</div>
+<div class="layui-form-item" style="text-align: center;">
+    <div class="layui-inline">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-inline">
+            <input type = "password" placeholder="密码" name="encrptPassword" id="encrptPassword" class="layui-input">
+        </div>
+    </div>
+</div>
+
+<div  align="center">
+    <div style="width: 216px; margin: 0;" >
+        <button id="login" type="submit" class="layui-btn layui-btn-fluid">登录</button>
+    </div>
+</div>
+</div>
+<div  align="center">
+    <div style="width: 216px; margin: 0;" >
+        <button id="register" type="submit" class="layui-btn layui-btn-fluid">注册</button>
+    </div>
+</div>
+</div>
+
+<script src="/js/lib/jquery-2.1.1.min.js"></script>
+<script>
+    $("#register").click(function(){
+        window.location.href="/html/register.html";
+    }
+    )
+    $("#login").click(function () {
+        var username = $("#username").val();
+        var encrptPassword = $("#encrptPassword").val();
+        if(username == null||username ==""){
+            alert("用户名不能为空");
+            return false
+        }
+        if(encrptPassword == null||encrptPassword ==""){
+            alert("密码不能为空");
+            return false
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/login',
+            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+            data: {
+                "name":username,
+                "encrptPassword":encrptPassword
+            },
+            success: function (result) {
+                if (result.code == 0) {
+                    alert("登录成功！");
+                } else {
+                    alert(result.data);
+                }
+            }, error: function (e) {//响应不成功时返回的函数
+                console.log(e, 'error');
+            }
+        });
+    })
+
+</script>
+
+</body>
+</html>
