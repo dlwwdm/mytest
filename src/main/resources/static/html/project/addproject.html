@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+<body>
+<div id="add-main" >
+    <form class="layui-form" id="add-form" name="add-form" action="" lay-filter="add-form">
+        <div class="layui-form-item center" >
+            <label class="layui-form-label" style="width: 100px" >项目名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="projectName" name="projectName" required value="" style="width: 240px" lay-verify="required" placeholder="请输入配置名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">模块名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="moduleName" name="moduleName" required style="width: 240px" lay-verify="required" placeholder="请输入模块名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">IP地址&emsp;</label>
+            <div class="layui-input-block">
+                <input type="text" id="ipAddress" name="ipAddress" required style="width: 240px" lay-verify="required" placeholder="请输入IP地址" autocomplete="off" class="layui-input">
+                <!-- <input type="hidden" name="id" style="width: 240px" autocomplete="off" class="layui-input"> -->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">描述&emsp;</label>
+            <div class="layui-input-block">
+                <input type="text" id="description" name="description" required style="width: 240px"  placeholder="请输入描述" autocomplete="off" class="layui-input">
+                <!-- <input type="hidden" name="id" style="width: 240px" autocomplete="off" class="layui-input"> -->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button id="submit" class="layui-btn" lay-submit lay-filter="save" >立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="closeBtn" >重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+
+<script src="/layui/layui.js" charset="utf-8"></script>
+<script src="/js/lib/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+    $("#submit").click(function () {
+        var projectName = $("#projectName").val();
+        var moduleName = $("#moduleName").val();
+        var ipAddress = $("#ipAddress").val();
+        var description = $("#description").val();
+        $.ajax({
+            type: 'POST',
+            url: '/addproject',
+            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+            async: false,
+            data: {
+                "projectName":projectName,
+                "moduleName":moduleName,
+                "ipAddress":ipAddress,
+                "description":description
+            },
+           // data:$('#add-form').serializeObject(),
+            xhrFields:{withCredentials:true},
+            success: function (result) {
+                if (result.code == 0) {
+                    var index = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(index);
+                    alert("添加项目成功!");
+                    window.parent.location.reload();
+                } else {
+                    alert(result.data);
+                }
+            }, error: function (e) {//响应不成功时返回的函数
+                console.log(e, 'error');
+            }
+        });
+    })
+
+    $.fn.serializeObject = function() {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [ o[this.name] ];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+</script>>
+</html>

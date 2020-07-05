@@ -17,6 +17,5 @@ public interface UserService {
 
         List<UserModel> listUser();
 
-
         void login(UserModel userModel);
 }

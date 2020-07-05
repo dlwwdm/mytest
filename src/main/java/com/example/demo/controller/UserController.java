@@ -4,6 +4,7 @@ import com.example.demo.handler.GlobalExceptionHandler;
 import com.example.demo.handler.ResponseInfo;
 import com.example.demo.model.UserModel;
 import com.example.demo.service.UserService;
+import lombok.extern.log4j.Log4j;
 import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @RestController
+
 public class UserController extends GlobalExceptionHandler {
 
     @Autowired

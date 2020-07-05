@@ -81,12 +81,9 @@ public class UserServiceImpl implements UserService {
             throw new BusinessErrorException(BusinessMsgEnum.USER_NOT_EXIST);
         }
         UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(userDO.getId());
-        System.out.println(userPasswordDO.getEncrptPassword());
-        System.out.println(userModel.getEncrptPassword());
         if(!(userPasswordDO.getEncrptPassword().equals(userModel.getEncrptPassword()))){
             throw new BusinessErrorException(BusinessMsgEnum.USER_PASSWORD_NOT_EQUALS);
         }
-
     }
 
     private UserDO coverUserDoFromUserModel (UserModel userModel){

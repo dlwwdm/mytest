@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+<body>
+
+<blockquote class="layui-elem-quote news_search">
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so" id="complain_search">
+            项目名称:
+            <div class="layui-input-inline">
+                <input type="text" name="serviceCode" id="serviceCode"
+                       placeholder="请输入服务编号" autocomplete="off" class="layui-input">
+            </div>
+            模块名称:
+            <div class="layui-input-inline">
+                <input type="text" name="compOrder" id="compOrder"
+                       placeholder="请输入订单号" autocomplete="off" class="layui-input">
+            </div>
+            接口地址:
+            <div class="layui-input-inline">
+                <select name="compType" id="compType">
+                    <option value="">---请选择---</option>
+                    <option value="0">医院</option>
+                    <option value="1">科室</option>
+                    <option value="2">医生</option>
+                </select>
+            </div>
+            描述:
+            <div class="layui-input-inline">
+                <select name="complainState" id="complainState">
+                    <option value="">---请选择---</option>
+                    <option value="0">未处理</option>
+                    <option value="1">已处理</option>
+                </select>
+            </div>
+            <button id="search" class="layui-btn" lay-submit
+                    lay-filter="provinceSearch">
+                <i class="layui-icon">&#xe615;</i>
+            </button>
+        </form>
+    </div>
+    <table class="layui-hide" id="complainTable" lay-filter="complainList"></table>
+</blockquote>
+
+    <table class="layui-hide" id="projectTable" lay-filter="projectTable"></table>
+    <div style="display: none" id="projectToolBar">
+        <button type="button" class="layui-btn layui-btn-sm" lay-event="add">新增</button>
+        <button type="button" class="layui-btn layui-btn-sm" lay-event="delete">删除</button>
+    </div>
+    <div id="userBar" style="display:none;">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </div>
+
+    <script src="/layui/layui.js" charset="utf-8"></script>
+    <script src="/js/lib/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" charset="UTF-8">
+        layui.use(['table','jquery','layer','form'],function () {
+            var table = layui.table;
+            var $ = layui.jquery;
+            var form = layui.form;
+            var layer = layui.layer;
+
+            table.render({
+                elem : '#projectTable',
+                url : '/listproject',
+                title:'项目列表',
+                toolbar:'#projectToolBar',
+                page: true,
+                limit: 3,
+                limits: [2, 3, 5],
+                cols:[[
+                    {type: 'checkbox', fixed: 'left'},
+                    {title: '序号',templet: '#xuhao',sort: true},
+                    {field:'id', title:'ID', width:200,hide:true},
+                    {field:'projectName', title:'项目名称', width:300},
+                    {field:'moduleName', title:'模块名称', width:300},
+                    {field:'ipAddress', title:'IP地址', width:300},
+                    {field:'description', title:'描述', width:300},
+                    {fixed: 'right', title:'操作', toolbar: '#userBar', width:300}
+                ]],
+                initSort: {
+                    field: '#xuhao' //排序字段，对应 cols 设定的各字段名
+                    ,type: 'asc' //排序方式  asc: 升序、desc: 降序、null: 默认排序
+                }
+            })
+
+            table.on('tool(projectTable)', function(obj){
+                var data = obj.data;
+                var layEvent = obj.event;
+                if(layEvent === 'del'){
+                    layer.msg("删除");
+                    layer.confirm('真的删除行么', function(index){
+                        onDelBtn($,obj,index);
+                    });
+                } else if(layEvent === 'edit'){ //编辑
+                    layer.open({
+                        //layer提供了5种层类型。可传入的值有：0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）
+                        type:2,
+                        title:"修改用户信息",
+                        area: ['70%','70%'],
+                        content:encodeURI('/html/project/editproject.html?projectName='+data.projectName+
+                            '&moduleName='+data.moduleName+'&ipAddress='+data.ipAddress+'&description='+data.description+'&id='+data.id)
+                    });
+                }
+            });
+
+            table.on('checkbox(projectTable)', function(obj){
+                console.log(obj.checked);
+                console.log(obj.data);
+                console.log(obj.type);
+            });
+
+            table.on('toolbar(projectTable)',function(obj){
+                switch(obj.event){
+                    case 'add':
+                        onAddBtn();
+                        break;
+                    case 'delete':
+                        layer.msg('删除');
+                        break;
+                };
+            })
+        })
+        function onAddBtn(){
+            //页面层-自定义
+            layer.open({
+                type: 2,
+                title:"新增项目",
+                closeBtn: false,
+                shift: 2,
+                area: ['400px', '300px'],
+                shadeClose: true,
+                content: ["/html/project/addproject.html","no"],
+                success: function(layero, index){},
+                yes:function(){
+                }
+            });
+        }
+
+        function onDelBtn($,obj,index) {
+            $.ajax({
+                type:'GET',
+                url:'/deleteproject',
+                data:{'id':obj.data.id},
+                success: function (result) {
+                    if (result.code == 0) {
+                        obj.del();
+                        layer.msg("删除成功");
+                        layer.close(index);
+                    } else {
+                        alert(result.data);
+                    }
+                }, error: function (e) {//响应不成功时返回的函数
+                    console.log(e, 'error');
+                }
+            })
+        }
+    </script>
+
+<script type="text/html" id="xuhao">
+    {{d.LAY_TABLE_INDEX+1}}
+</script>
+
+
+</body>
+</html>

@@ -4,10 +4,13 @@ public enum  BusinessMsgEnum {
     /**
      * 参数异常
      */
-    PARAMETER_VALIDATION_EXCEPTION("100011", "参数不合法!"),
+    //100开头，用户相关
+    PARAMETER_VALIDATION_EXCEPTION("10001", "参数不合法!"),
     USER_HAS_REGISTER("10002", "用户已存在!"),
     USER_NOT_EXIST("10003", "用户不存在!"),
     USER_PASSWORD_NOT_EQUALS("10004", "密码错误!"),
+    //200开头项目相关
+    PROJECT_HAS_EXIST("20002", "项目已存在!"),
     /**
      * 等待超时
      */

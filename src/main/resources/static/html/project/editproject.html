@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+<body>
+<div id="add-main" >
+    <form class="layui-form" id="edit-form" action="" lay-filter="edit-form">
+        <div class="layui-form-item center" >
+            <label class="layui-form-label" style="width: 100px" >项目名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="projectName" name="projectName" required value="" style="width: 240px" lay-verify="required"  autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">模块名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="moduleName" name="moduleName" required style="width: 240px" lay-verify="required"  autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">IP地址&emsp;</label>
+            <div class="layui-input-block">
+                <input type="text" id="ipAddress" name="ipAddress" required style="width: 240px" lay-verify="required"  autocomplete="off" class="layui-input">
+                <!-- <input type="hidden" name="id" style="width: 240px" autocomplete="off" class="layui-input"> -->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">描述&emsp;</label>
+            <div class="layui-input-block">
+                <input type="text" id="description" name="description" required style="width: 240px"   autocomplete="off" class="layui-input">
+                <!-- <input type="hidden" name="id" style="width: 240px" autocomplete="off" class="layui-input"> -->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button id="save" class="layui-btn" lay-submit lay-filter="save" >保存</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="closeBtn" >重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+
+<script src="/layui/layui.js" charset="utf-8"></script>
+<script src="/js/lib/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" charset="UTF-8">
+    layui.use(['table','jquery','layer','form'],function () {
+        var $ = layui.jquery;
+        var form = layui.form;
+        form.render()//更新渲染表单
+        form.val('edit-form',{
+            //填充表单
+            projectName: getQueryVariable("projectName"),
+            moduleName: getQueryVariable("moduleName"),
+            ipAddress: getQueryVariable("ipAddress"),
+            description: getQueryVariable("description")
+        })
+    })
+
+    function getQueryVariable(variable){
+        var query = decodeURI(window.location.search.substring(1));
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable){
+                return pair[1];
+            }
+        }
+        return(false);
+    }
+
+    $("#save").click(function () {
+        var id = getQueryVariable("id");
+        var projectName = $("#projectName").val();
+        var moduleName = $("#moduleName").val();
+        var ipAddress = $("#ipAddress").val();
+        var description = $("#description").val();
+        var data = {
+            "id":id,
+            "projectName":projectName,
+            "moduleName":moduleName,
+            "ipAddress":ipAddress,
+            "description":description
+        };
+        $.ajax({
+            type: 'POST',
+            url: '/editproject',
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            data: JSON.stringify(data),
+            xhrFields:{withCredentials:true},
+            success: function (result) {
+                if (result.code == 0) {
+                    var index = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(index);
+                    alert("项目信息修改成功!")
+                    window.parent.location.reload();
+                } else {
+                    alert(result.data);
+                }
+            }, error: function (e) {//响应不成功时返回的函数
+                console.log(e, 'error');
+            }
+        });
+    })
+
+    $.fn.serializeObject = function() {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [ o[this.name] ];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+
+</script>
+
+</html>
