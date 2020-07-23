@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+<body>
+<div id="add-main" >
+
+    <form class="layui-form-item" id="add-form" name="add-form" action="" lay-filter="add-form">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">项目名称</label>
+                <div class="layui-input-inline" style="width:450px">
+                    <select name="projectName" id="projectName" lay-verify="required" lay-filter="projectFilter"  class="select">
+                        <option value="0" >请选择项目</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">模块名称</label>
+                <div class="layui-input-inline" style="width:450px">
+                    <select name="moduleName" id="moduleName" lay-moduleName="required" class="select" lay-filter="moduleFilter">
+                        <option value="0" >请选择模块</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">接口名称&emsp;</label>
+            <div class="layui-input-block">
+                <input type="text" id="interfaceName" name="interfaceName" required style="width: 240px" lay-verify="required" placeholder="接口名称" autocomplete="off" class="layui-input">
+                <!-- <input type="hidden" name="id" style="width: 240px" autocomplete="off" class="layui-input"> -->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">请求方式&emsp;</label>
+            <div class="layui-input-block">
+                <input type="text" id="requestMethod" name="requestMethod" required style="width: 240px" lay-verify="required" placeholder="请求方式" autocomplete="off" class="layui-input">
+                <!-- <input type="hidden" name="id" style="width: 240px" autocomplete="off" class="layui-input"> -->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">参数格式&emsp;</label>
+            <div class="layui-input-block">
+                <input type="text" id="parameterType" name="parameterType" required style="width: 240px" lay-verify="required" placeholder="参数格式" autocomplete="off" class="layui-input">
+                <!-- <input type="hidden" name="id" style="width: 240px" autocomplete="off" class="layui-input"> -->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">请求路径&emsp;</label>
+            <div class="layui-input-block">
+                <input type="text" id="path" name="path" required style="width: 240px" lay-verify="required" placeholder="请求路径" autocomplete="off" class="layui-input">
+                <!-- <input type="hidden" name="id" style="width: 240px" autocomplete="off" class="layui-input"> -->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">接口描述&emsp;</label>
+            <div class="layui-input-block">
+                <input type="text" id="description" name="description" required style="width: 240px"  placeholder="接口描述" autocomplete="off" class="layui-input">
+                <!-- <input type="hidden" name="id" style="width: 240px" autocomplete="off" class="layui-input"> -->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button id="submit" class="layui-btn" lay-submit lay-filter="save" >立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" id="closeBtn" >重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+
+<script src="/layui/layui.js" charset="utf-8"></script>
+<script src="/js/lib/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+    layui.use('form', function(){
+        var form = layui.form;
+        var $ = layui.jquery;
+        form.render('select');   //表单渲染，得渲染才会有效果显示出来
+        $.ajax({
+            url: '/listproject',
+            type: 'get',
+            success: function(data) {
+                if (data!== null) {
+                    $("#projectName").empty();
+                    $("#moduleName").empty();
+                    $("#projectName").append(new Option("请选择项目名称", "0"));
+                    $("#moduleName").append(new Option("请选择模块名称", "0"));
+                    $.each(data.data, function(index, item) {
+                        $.each(item,function(key,val){
+                            if(key == 'projectName'){
+                                $('#projectName').append(new Option(val));
+                            }
+                            if(key == 'moduleName'){
+                                $('#moduleName').append(new Option(val));
+                            }
+                        })
+                    });
+                } else {
+                    $("#projectName").append(new Option("暂无数据", ""));
+                    $("#moduleName").append(new Option("暂无数据", ""));
+                }
+                //重新渲染
+                form.render("select");
+            }
+        });
+
+        // $.ajax({
+        //     url: '/listmodule',
+        //     type: 'get',
+        //     success: function(data) {
+        //         if (data!== null) {
+        //             $("#moduleName").empty();
+        //             $("#moduleName").append(new Option("请选择模块", "0"));
+        //             $.each(data.data, function(index, item) {
+        //                 $.each(item,function(key,val){
+        //                     if(key == 'moduleName'){
+        //                         $('#moduleName').append(new Option(val));
+        //                     }
+        //
+        //                 })
+        //             });
+        //         } else {
+        //             $("#projectName").append(new Option("暂无数据", ""));
+        //         }
+        //         //重新渲染
+        //         form.render("select");
+        //     }
+        // });
+
+    }),
+    $("#submit").click(function () {
+        var projectName = $("#projectName").val();
+        var moduleName = $("#moduleName").val();
+        var ipAddress = $("#ipAddress").val();
+        var description = $("#description").val();
+        $.ajax({
+            type: 'POST',
+            url: '/addinterface',
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            dataType: "json",
+            data:JSON.stringify($('#add-form').serializeObject()),
+            xhrFields:{withCredentials:true},
+            success: function (result) {
+                if (result.code == 0) {
+                    var index = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(index);
+                    alert("添加接口成功!");
+                    window.parent.location.reload();
+                } else {
+                    alert(result.data);
+                }
+            }, error: function (e) {//响应不成功时返回的函数
+                console.log('>>>>>>>>>>>>>>>>>>', $('#add-form').serializeObject());
+                console.log(e, 'error');
+            }
+        });
+    })
+
+    $.fn.serializeObject = function() {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [ o[this.name] ];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+</script>
+</html>

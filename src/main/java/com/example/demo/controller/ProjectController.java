@@ -5,6 +5,7 @@ import com.example.demo.dao.ProjectDOMapper;
 import com.example.demo.dataobject.ProjectDO;
 import com.example.demo.handler.ResponseInfo;
 import com.example.demo.service.ProjectService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(allowCredentials = "true",allowedHeaders = "*")
+@Slf4j
 public class ProjectController {
 
     @Autowired
@@ -20,6 +22,9 @@ public class ProjectController {
     @RequestMapping(value = "/listproject" ,method = RequestMethod.GET)
     public ResponseInfo listProject(){
         List<ProjectDO> projectDOList = projectService.listProject();
+        for (ProjectDO projectDO:projectDOList) {
+        log.info(projectDO.toString());
+        }
         return new ResponseInfo(projectDOList);
     }
 
@@ -39,12 +44,12 @@ public class ProjectController {
 
     @RequestMapping(value = "/editproject", method = RequestMethod.POST,consumes = {"application/json"})
     public ResponseInfo editProject(@RequestBody JSONObject jsonObject){
-        ProjectDO projectDO = new ProjectDO();
-        projectDO.setId(jsonObject.getInteger("id"));
-        projectDO.setDescription(jsonObject.getString("description"));
-        projectDO.setIpAddress(jsonObject.getString("ipAddress"));
-        projectDO.setModuleName(jsonObject.getString("moduleName"));
-        projectDO.setProjectName(jsonObject.getString("projectName"));
+        ProjectDO projectDO = JSONObject.toJavaObject(jsonObject,ProjectDO.class);
+//        projectDO.setId(jsonObject.getInteger("id"));
+//        projectDO.setDescription(jsonObject.getString("description"));
+//        projectDO.setIpAddress(jsonObject.getString("ipAddress"));
+//        projectDO.setModuleName(jsonObject.getString("moduleName"));
+//        projectDO.setProjectName(jsonObject.getString("projectName"));
         return new ResponseInfo(projectService.editProject(projectDO));
     }
 

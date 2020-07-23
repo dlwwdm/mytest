@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+<body>
+<div style="padding: 20px; background-color: #F2F2F2;">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header center">基本信息</div>
+                <div class="layui-card-body">
+                    <div class="layui-form-item center" >
+                        <label class="layui-form-label" style="width: 100px" >项目名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="projectName" name="projectName" required value="" style="width: 240px" lay-verify="required" placeholder="请输入配置名称" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">参数信息</div>
+                <div class="layui-card-body">
+                    结合 layui 的栅格系统<br>
+                    轻松实现响应式布局
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">响应结果</div>
+                <div class="layui-card-body">
+                    结合 layui 的栅格系统<br>
+                    轻松实现响应式布局
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script src="/layui/layui.js" charset="utf-8"></script>
+<script src="/js/lib/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+    layui.use('form', function(){
+        var form = layui.form;
+        var $ = layui.jquery;
+        form.render('select');   //表单渲染，得渲染才会有效果显示出来
+        $.ajax({
+            url: '/listproject',
+            type: 'get',
+            success: function(data) {
+                if (data!== null) {
+                    $("#projectName").empty();
+                    $("#moduleName").empty();
+                    $("#projectName").append(new Option("请选择项目名称", "0"));
+                    $("#moduleName").append(new Option("请选择模块名称", "0"));
+                    $.each(data.data, function(index, item) {
+                        $.each(item,function(key,val){
+                            if(key == 'projectName'){
+                                $('#projectName').append(new Option(val));
+                            }
+                            if(key == 'moduleName'){
+                                $('#moduleName').append(new Option(val));
+                            }
+                        })
+                    });
+                } else {
+                    $("#projectName").append(new Option("暂无数据", ""));
+                    $("#moduleName").append(new Option("暂无数据", ""));
+                }
+                //重新渲染
+                form.render("select");
+            }
+        });
+
+        $.ajax({
+            url: '/listinterface',
+            type: 'get',
+            success: function(data) {
+                if (data!== null) {
+                    $("#interfaceName").empty();
+                    $("#interfaceName").append(new Option("请选择模块", "0"));
+                    $.each(data.data, function(index, item) {
+                        $.each(item,function(key,val){
+                            if(key == 'interfaceName'){
+                                $('#interfaceName').append(new Option(val));
+                            }
+                        })
+                    });
+                } else {
+                    $("#interfaceName").append(new Option("暂无数据", ""));
+                }
+                //重新渲染
+                form.render("select");
+            }
+        });
+
+    }),
+        $("#submit").click(function () {
+            $.ajax({
+                type: 'POST',
+                url: '/addcase',
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                dataType: "json",
+                data:JSON.stringify($('#add-form').serializeObject()),
+                xhrFields:{withCredentials:true},
+                success: function (result) {
+                    if (result.code == 0) {
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                        alert("添加用例成功!");
+                        window.parent.location.reload();
+                    } else {
+                        alert(result.data);
+                    }
+                }, error: function (e) {//响应不成功时返回的函数
+                    console.log('>>>>>>>>>>>>>>>>>>', $('#add-form').serializeObject());
+                    console.log(e, 'error');
+                }
+            });
+        })
+
+    $.fn.serializeObject = function() {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [ o[this.name] ];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+</script>
+</html>

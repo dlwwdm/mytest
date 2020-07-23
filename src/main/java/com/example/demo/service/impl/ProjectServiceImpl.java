@@ -26,7 +26,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDO addProject(ProjectDO projectDO) {
-       ProjectDO  projectDOExist = projectDOMapper.selectByModuleNameAndIP(projectDO);
+       ProjectDO  projectDOExist = projectDOMapper.selectByModuleNameAndProjectName(projectDO);
         if(projectDO == null){
             throw new BusinessErrorException(BusinessMsgEnum.PARAMETER_VALIDATION_EXCEPTION);
         }

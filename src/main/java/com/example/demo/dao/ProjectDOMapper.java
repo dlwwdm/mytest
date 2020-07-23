@@ -37,7 +37,7 @@ public interface ProjectDOMapper {
      */
     ProjectDO selectByPrimaryKey(Integer id);
 
-    ProjectDO selectByModuleNameAndIP(ProjectDO record);
+    ProjectDO selectByModuleNameAndProjectName(ProjectDO record);
 
     List<ProjectDO> listProject();
 
