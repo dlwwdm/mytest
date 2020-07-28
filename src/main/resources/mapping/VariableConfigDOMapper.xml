@@ -59,6 +59,13 @@
     order by id DESC
   </select>
 
+  <select id="selectIdByCollectionIdAndVariableName" parameterType="com.example.demo.dataobject.VariableConfigDO" resultType="java.lang.Integer">
+    select
+    id
+    from tb_variable_config
+    where collection_id = #{collectionId,jdbcType=INTEGER} and variable_name = #{variableName,jdbcType=VARCHAR}
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     <!--
       WARNING - @mbg.generated
@@ -79,6 +86,18 @@
     values (#{id,jdbcType=INTEGER}, #{variableName,jdbcType=VARCHAR}, #{collectionId,jdbcType=INTEGER}, 
       #{variableValue,jdbcType=LONGVARCHAR})
   </insert>
+
+  <insert id="insertAndUpdate" parameterType="com.example.demo.dataobject.VariableConfigDO" keyProperty="id" useGeneratedKeys="true">
+    insert into tb_variable_config (id, variable_name, collection_id,
+    variable_value)
+    values (#{id,jdbcType=INTEGER}, #{variableName,jdbcType=VARCHAR}, #{collectionId,jdbcType=INTEGER},
+    #{variableValue,jdbcType=LONGVARCHAR})
+    ON DUPLICATE KEY UPDATE
+    variable_name = #{variableName,jdbcType=VARCHAR},
+    variable_value = #{variableValue,jdbcType=LONGVARCHAR},
+    collection_id = #{collectionId,jdbcType=INTEGER}
+  </insert>
+
   <insert id="insertSelective" parameterType="com.example.demo.dataobject.VariableConfigDO" keyProperty="id" useGeneratedKeys="true">
     <!--
       WARNING - @mbg.generated

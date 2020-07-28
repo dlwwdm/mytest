@@ -20,6 +20,6 @@ public class ApiTestController {
              ) {
             log.info(id.toString());
         }
-        apiTestService.executeCase(apiList);
+        apiTestService.executeCase(0,apiList);
     }
 }

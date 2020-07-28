@@ -33,19 +33,20 @@ public class ApiTestServiceImp implements ApiTestService {
     HttpRequest httpRequest;
 
     @Override
-    public void executeCase(List<Integer> apiList) {
-        convertCaseModuleFromCaseDO(apiList);
+    public void executeCase(Integer collectionId,List<Integer> apiList) {
+        convertCaseModuleFromCaseDO(collectionId,apiList);
     }
 
-    public void convertCaseModuleFromCaseDO(List<Integer> apiList){
+    public void convertCaseModuleFromCaseDO(Integer collectionId,List<Integer> apiList){
         List<CaseDO> caseDOList = caseDOMapper.selectByIdList(apiList);
         for (CaseDO caseDO:caseDOList) {
+            log.info(caseDO.toString());
             CaseModule caseModule = new CaseModule();
             Integer interfaceId = caseDO.getInterfaceId();
             InterfaceDO interfaceDO = interfaceDOMapper.selectByPrimaryKey(interfaceId);
             BeanUtils.copyProperties(interfaceDO,caseModule);
             BeanUtils.copyProperties(caseDO,caseModule);
-            httpRequest.doRequest(caseModule);
+            httpRequest.doRequest(collectionId,caseModule);
         }
     }
 }

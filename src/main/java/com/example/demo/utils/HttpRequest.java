@@ -34,24 +34,35 @@ import java.util.*;
 public class HttpRequest {
 
     @Autowired
-    ProjectDOMapper projectDOMapper;
+    static ProjectDOMapper projectDOMapper;
 
     @Autowired
-    CaseDOMapper caseDOMapper;
+    static CaseDOMapper caseDOMapper;
 
     @Autowired
-    VariableConfigDOMapper variableConfigDOMapper;
+    static VariableConfigDOMapper variableConfigDOMapper;
 
-    public  void doRequest(CaseModule caseModule){
+    @Autowired
+    static SaveVariable saveVariable;
+
+    @Autowired
+    static CheckResult checkResult;
+
+    @Autowired
+    static ReplaceParameter replaceParameter;
+
+    public static String doRequest(Integer collectionId, CaseModule caseModule) {
         ProjectDO projectDO = new ProjectDO();
-        BeanUtils.copyProperties(caseModule,projectDO);
+        BeanUtils.copyProperties(caseModule, projectDO);
         ProjectDO projectDO1 = projectDOMapper.selectByModuleNameAndProjectName(projectDO);
-        String url = projectDO1.getIpAddress() ;
+        String url = projectDO1.getIpAddress();
         String path = caseModule.getPath();
         String requestMethod = caseModule.getRequestMethod();
         String body = caseModule.getBodyValue();
         String headerString = caseModule.getHeaderValue();
         String parameterType = caseModule.getParameterType();
+        String variableList = caseModule.getVariableList();
+        String expectList = caseModule.getExpectList();
 
         JSONObject headerJson = JSON.parseObject(headerString);
 
@@ -62,66 +73,65 @@ public class HttpRequest {
         //获取全局变量
         List<VariableConfigDO> variableConfigDOS = variableConfigDOMapper.selectByCollectionId(0);
         Map globalVariable = new HashMap();
-        for (VariableConfigDO variableConfigDO: variableConfigDOS ) {
-            globalVariable.put(variableConfigDO.getVariableName(),variableConfigDO.getVariableValue());
-            log.info(variableConfigDO.getVariableName()+":"+variableConfigDO.getVariableValue());
+        for (VariableConfigDO variableConfigDO : variableConfigDOS) {
+            globalVariable.put(variableConfigDO.getVariableName(), variableConfigDO.getVariableValue());
         }
+        body = replaceParameter.replaceParameter(body, collectionId);
+        log.info("请求参数为：" + body);
 
 
-//        if(requestMethod.equalsIgnoreCase("get")){
-//            HttpGet httpGet = new HttpGet(url+path);
-//            for(Map.Entry<String,Object> entry : headerJson.entrySet()){
-//                httpGet.addHeader(entry.getKey(), (String) entry.getValue());
-//            }
-//
-//            try {
-//                response = httpClient.execute(httpGet);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }else if(requestMethod.equalsIgnoreCase("post")){
-//            HttpPost httpPost = new HttpPost(url+path);
-//            log.info(url+path);
-//            for(Map.Entry<String,Object> entry : headerJson.entrySet()){
-//                httpPost.setHeader(entry.getKey(), (String) entry.getValue());
-//            }
-//            try {
-//                if(parameterType.equalsIgnoreCase("json")){
-//                httpPost.setEntity(new StringEntity(body, Charset.forName("UTF-8")));
-//                }else if(parameterType.equalsIgnoreCase("form")){
-//                    List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
-//                    JSONObject bodyJson = JSONObject.parseObject(body);
-//                    for(Map.Entry entry:bodyJson.entrySet()){
-//                      BasicNameValuePair basicNameValuePair =  new BasicNameValuePair(entry.getKey().toString(),entry.getValue().toString());
-//                      nameValuePairList.add(basicNameValuePair);
-//                    }
-//                    httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairList, "UTF-8"));
-//                    log.info(String.valueOf(httpPost.getEntity()));
-//                }
-//                response = httpClient.execute(httpPost);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        HttpEntity responseEntity = response.getEntity();
-//        int statusCode = 0 ;
-//        String status = String.valueOf(response.getStatusLine());
-//        if(status.contains("200")){
-//            statusCode = 200;
-//        }
-//        log.info(String.valueOf(response.getStatusLine()));
-//        try {
-//            //log.info(EntityUtils.toString(responseEntity,"UTF-8"));
-//            String result = EntityUtils.toString(responseEntity,"UTF-8");
-//            CaseDO caseDO =new CaseDO();
-//            caseDO.setId(caseModule.getId());
-//            caseDO.setStatus(statusCode);
-//            caseDO.setResult(result);
-//            caseDOMapper.updateStatusAndResult(caseDO);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
+        if (requestMethod.equalsIgnoreCase("get")) {
+            HttpGet httpGet = new HttpGet(url + path);
+            for (Map.Entry<String, Object> entry : headerJson.entrySet()) {
+                httpGet.addHeader(entry.getKey(), (String) entry.getValue());
+            }
+
+            try {
+                response = httpClient.execute(httpGet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (requestMethod.equalsIgnoreCase("post")) {
+            HttpPost httpPost = new HttpPost(url + path);
+            log.info(url + path);
+            for (Map.Entry<String, Object> entry : headerJson.entrySet()) {
+                httpPost.setHeader(entry.getKey(), (String) entry.getValue());
+            }
+            try {
+                if (parameterType.equalsIgnoreCase("json")) {
+                    httpPost.setEntity(new StringEntity(body, Charset.forName("UTF-8")));
+                } else if (parameterType.equalsIgnoreCase("form")) {
+                    List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
+                    JSONObject bodyJson = JSONObject.parseObject(body);
+                    for (Map.Entry entry : bodyJson.entrySet()) {
+                        BasicNameValuePair basicNameValuePair = new BasicNameValuePair(entry.getKey().toString(), entry.getValue().toString());
+                        nameValuePairList.add(basicNameValuePair);
+                    }
+                    httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairList, "UTF-8"));
+                    log.info(String.valueOf(httpPost.getEntity()));
+                }
+                response = httpClient.execute(httpPost);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        HttpEntity responseEntity = response.getEntity();
+        try {
+            String result = EntityUtils.toString(responseEntity, "UTF-8");
+            CaseDO caseDO = new CaseDO();
+            caseDO.setId(caseModule.getId());
+            caseDO.setResult(result);
+            checkResult.checkResponse(expectList, result, caseDO);
+            caseDOMapper.updateStatusAndResult(caseDO);
+            log.info("SUCCESS");
+            //保存集合变量
+            saveVariable.saveCollectionVariable(collectionId, variableList, result);
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
-
 }
+
+
