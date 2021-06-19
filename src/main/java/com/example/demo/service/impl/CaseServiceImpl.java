@@ -48,6 +48,11 @@ public class CaseServiceImpl implements CaseService {
         return this.coverCaseModuleFromCase(caseDOMapper.selectByPrimaryKey(caseDO.getId()));
     }
 
+    @Override
+    public void deleteCase(Integer id) {
+        caseDOMapper.deleteByPrimaryKey(id);
+    }
+
     public CaseModule coverCaseModuleFromCaseAndInterface(CaseDO caseDO, InterfaceDO interfaceDO){
         CaseModule caseModule = new CaseModule();
         BeanUtils.copyProperties(interfaceDO,caseModule);

@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.demo.handler.GlobalExceptionHandler;
 import com.example.demo.handler.ResponseInfo;
 import com.example.demo.model.UserModel;
@@ -17,26 +18,23 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @RestController
-
+@CrossOrigin(allowCredentials = "true",allowedHeaders = "*")
 public class UserController extends GlobalExceptionHandler {
 
     @Autowired
     UserService userService;
+
     //用户注册
-    @RequestMapping(value = "/register" ,method = {RequestMethod.POST} ,consumes = {"application/x-www-form-urlencoded"} )
+    @RequestMapping(value = "/register",method = RequestMethod.POST,consumes = "application/json")
     @ResponseBody
     @Transactional
-    public ResponseInfo registerUser(@RequestParam(name = "name")String name,
-                             @RequestParam(name = "telphone")String telphone,
-                             @RequestParam(name = "email")String email,
-                             @RequestParam(name = "gender")String gender,
-                             @RequestParam(name = "encrptPassword")String encrptPassword) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public ResponseInfo registerUser(@RequestBody JSONObject jsonObject) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         UserModel userModel = new UserModel();
-        userModel.setEncrptPassword(this.EncodeByMD5(encrptPassword));
-        userModel.setName(name);
-        userModel.setEmail(email);
-        userModel.setGender(gender);
-        userModel.setTelphone(telphone);
+        userModel.setEncrptPassword(this.EncodeByMD5(jsonObject.getString("encrptPassword")));
+        userModel.setName(jsonObject.getString("name"));
+        userModel.setEmail(jsonObject.getString("email"));
+        userModel.setGender(jsonObject.getString("gender"));
+        userModel.setTelphone(jsonObject.getString("telphone"));
         userService.register(userModel);
         return new ResponseInfo(userModel);
     }
@@ -62,12 +60,11 @@ public class UserController extends GlobalExceptionHandler {
     }
 
     //用户登录
-    @RequestMapping(value = "login",method = RequestMethod.POST)
-    public ResponseInfo login(@RequestParam(name = "name")String name,
-                              @RequestParam(name = "encrptPassword")String encrptPassword) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    @RequestMapping(value = "/login",method = RequestMethod.POST,consumes = "application/json")
+    public ResponseInfo login(@RequestBody JSONObject jsonObject) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         UserModel userModel = new UserModel();
-        userModel.setName(name);
-        userModel.setEncrptPassword(this.EncodeByMD5(encrptPassword));
+        userModel.setName(jsonObject.getString("name"));
+        userModel.setEncrptPassword(this.EncodeByMD5(jsonObject.getString("encrptPassword")));
         userService.login(userModel);
         return new ResponseInfo(userModel);
     }

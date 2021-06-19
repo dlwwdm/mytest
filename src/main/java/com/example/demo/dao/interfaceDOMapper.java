@@ -56,4 +56,8 @@ public interface InterfaceDOMapper {
     List<InterfaceDO> listInterface();
 
     Integer selectUniqueInterface(String projectName,String moduleName,String interfaceName);
+
+    List<InterfaceDO> selectInterfaceByProjectAndModule(String projectName, String moduleName);
+
+    InterfaceDO selectBaseInformation(String projectName, String moduleName, String interfaceName);
 }

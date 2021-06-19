@@ -19,4 +19,5 @@ public class CaseModule {
     private String status;
     private String caseType;
     private String description;
+    private Integer collectionId;
 }

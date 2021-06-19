@@ -26,7 +26,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDO addProject(ProjectDO projectDO) {
-       ProjectDO  projectDOExist = projectDOMapper.selectByModuleNameAndProjectName(projectDO);
+        ProjectDO projectDOExist = projectDOMapper.selectByModuleNameAndProjectName(projectDO.getProjectName(),projectDO.getModuleName());
         if(projectDO == null){
             throw new BusinessErrorException(BusinessMsgEnum.PARAMETER_VALIDATION_EXCEPTION);
         }
@@ -44,8 +44,24 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public ProjectDO selectByPrimaryKey(Integer id) {
+        return projectDOMapper.selectByPrimaryKey(id);
+    }
+
+
+    @Override
     public void deleteProject(Integer id) {
         log.info("要删除的ID为："+id);
         projectDOMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public List<ProjectDO> selectByProjectName(String projectName) {
+        return projectDOMapper.selectByProjectName(projectName);
+    }
+
+    @Override
+    public ProjectDO selectByModuleNameAndProjectName(String projectName, String moduleName) {
+        return projectDOMapper.selectByModuleNameAndProjectName(projectName,moduleName);
     }
 }

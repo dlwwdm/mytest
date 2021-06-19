@@ -2,41 +2,34 @@ package com.example.demo.utils;
 
 
 import com.example.demo.dataobject.CaseDO;
+import com.example.demo.dataobject.InterfaceDO;
+import com.example.demo.model.CaseModule;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.testng.annotations.DataProvider;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class DataProvider_ForMysql implements Iterator<Object[]> {
+@Slf4j
+public class DataProvider_ForMysql  {
 
-        /** 查询结果集 */
-        List<CaseDO> caseList;
+    @Autowired
 
-        /** 总行数 */
-        private int rowNum=0;
-        /** 当前行数 */
-        private int curRowNo=0;
 
-        public DataProvider_ForMysql(List<CaseDO> cases){
-            this.caseList = cases;
-            this.rowNum = caseList.size();
+    @DataProvider
+        public static Iterator<Object[]> getData(List<CaseModule> caseModules){
+        List<Object[]> caseModules1 = new ArrayList<>();
+
+        for (CaseModule caseModule : caseModules) {
+            //做一个形式转换
+            log.info(caseModule.toString());
+            caseModules1.add(new CaseModule[] { caseModule });
         }
 
-        @Override
-        public boolean hasNext() {
-            if(rowNum==0||curRowNo>=rowNum){
-                return false;
-            }else{
-                return true;
-            }
-        }
-
-        @Override
-        public Object[] next() {
-            CaseDO caseDO = caseList.get(curRowNo);
-            Object[] o=new Object[1];
-            o[0]=caseDO;
-            this.curRowNo++;
-            return o;
-        }
+        return caseModules1.iterator();
+    }
     }
 

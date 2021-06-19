@@ -37,7 +37,7 @@ public interface ProjectDOMapper {
      */
     ProjectDO selectByPrimaryKey(Integer id);
 
-    ProjectDO selectByModuleNameAndProjectName(ProjectDO record);
+    ProjectDO selectByModuleNameAndProjectName(String projectName, String moduleName);
 
     List<ProjectDO> listProject();
 
@@ -56,4 +56,6 @@ public interface ProjectDOMapper {
      * @mbg.generated Fri Jun 26 20:00:44 CST 2020
      */
     int updateByPrimaryKey(ProjectDO record);
+
+    List<ProjectDO> selectByProjectName(String projectName);
 }

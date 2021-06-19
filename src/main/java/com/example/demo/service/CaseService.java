@@ -10,4 +10,6 @@ public interface CaseService {
     List<CaseModule> listCase();
 
     CaseModule addCase(JSONObject jsonObject);
+
+    void deleteCase(Integer id);
 }

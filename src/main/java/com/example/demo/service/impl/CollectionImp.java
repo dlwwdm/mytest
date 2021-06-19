@@ -4,10 +4,8 @@ import com.example.demo.dao.CollectionDOMapper;
 import com.example.demo.dataobject.CollectionDO;
 import com.example.demo.service.ApiTestService;
 import com.example.demo.service.CollectionService;
-import com.example.demo.utils.ExtentTestNGIReporterListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.testng.TestNG;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,12 +33,5 @@ public class CollectionImp implements CollectionService {
         apiTestService.executeCase(collectionDO.getId(),caseList);
     }
 
-    public void execute(){
-        TestNG testNg = new TestNG();
-        Class[] listenerClass = {ExtentTestNGIReporterListener.class};
-        testNg.setListenerClasses(Arrays.asList(listenerClass));
 
-        testNg.setTestClasses(new Class[]{CollectionExcute.class});
-        testNg.run();
-    }
 }

@@ -9,6 +9,9 @@ import com.example.demo.dataobject.CaseDO;
 import com.example.demo.dataobject.ProjectDO;
 import com.example.demo.dataobject.VariableConfigDO;
 import com.example.demo.model.CaseModule;
+import com.example.demo.utils.CheckResult;
+import com.example.demo.utils.ReplaceParameter;
+import com.example.demo.utils.SaveVariable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -23,7 +26,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -31,30 +38,32 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class HttpRequest {
+public class HttpRequest  {
 
     @Autowired
-    static ProjectDOMapper projectDOMapper;
+    ProjectDOMapper projectDOMapper;
 
     @Autowired
-    static CaseDOMapper caseDOMapper;
+     CaseDOMapper caseDOMapper;
 
     @Autowired
-    static VariableConfigDOMapper variableConfigDOMapper;
+     VariableConfigDOMapper variableConfigDOMapper;
 
     @Autowired
-    static SaveVariable saveVariable;
+    SaveVariable saveVariable;
 
     @Autowired
-    static CheckResult checkResult;
+    CheckResult checkResult;
 
     @Autowired
-    static ReplaceParameter replaceParameter;
+    ReplaceParameter replaceParameter;
 
-    public static String doRequest(Integer collectionId, CaseModule caseModule) {
+
+    public  String doRequest(Integer collectionId, CaseModule caseModule) {
+        log.info("开始发送请求");
         ProjectDO projectDO = new ProjectDO();
         BeanUtils.copyProperties(caseModule, projectDO);
-        ProjectDO projectDO1 = projectDOMapper.selectByModuleNameAndProjectName(projectDO);
+        ProjectDO projectDO1 = projectDOMapper.selectByModuleNameAndProjectName(projectDO.getProjectName(),projectDO.getModuleName());
         String url = projectDO1.getIpAddress();
         String path = caseModule.getPath();
         String requestMethod = caseModule.getRequestMethod();
@@ -77,7 +86,6 @@ public class HttpRequest {
             globalVariable.put(variableConfigDO.getVariableName(), variableConfigDO.getVariableValue());
         }
         body = replaceParameter.replaceParameter(body, collectionId);
-        log.info("请求参数为：" + body);
 
 
         if (requestMethod.equalsIgnoreCase("get")) {
@@ -122,7 +130,6 @@ public class HttpRequest {
             caseDO.setId(caseModule.getId());
             caseDO.setResult(result);
             checkResult.checkResponse(expectList, result, caseDO);
-            caseDOMapper.updateStatusAndResult(caseDO);
             log.info("SUCCESS");
             //保存集合变量
             saveVariable.saveCollectionVariable(collectionId, variableList, result);

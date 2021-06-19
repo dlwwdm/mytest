@@ -8,15 +8,13 @@ import com.example.demo.service.CaseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @Slf4j
+@CrossOrigin(allowCredentials = "true",allowedHeaders = "*")
 public class CaseController {
 
     @Autowired
@@ -30,8 +28,15 @@ public class CaseController {
 
     @RequestMapping(value = "/addcase",method = RequestMethod.POST,consumes = "application/json")
     public ResponseInfo addCase(@RequestBody JSONObject jsonObject){
+        log.info(jsonObject.toString());
         CaseModule caseModule = caseService.addCase(jsonObject);
         return new ResponseInfo(caseModule);
+    }
+
+    @RequestMapping(value = "/deletecase",method = RequestMethod.GET)
+    public ResponseInfo deleteCase(@RequestParam Integer id){
+        caseService.deleteCase(id);
+        return new ResponseInfo();
     }
 
 }

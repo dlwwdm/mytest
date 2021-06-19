@@ -12,5 +12,11 @@ public interface ProjectService {
 
     ProjectDO editProject(ProjectDO projectDO);
 
+    ProjectDO selectByPrimaryKey(Integer id);
+
     void deleteProject(Integer id);
+
+    List<ProjectDO> selectByProjectName(String projectName);
+
+    ProjectDO selectByModuleNameAndProjectName(String projectName, String moduleName);
 }
